@@ -63,7 +63,7 @@ export const MainDashboard: React.FC<any> = () => {
 
 	const [_viewTitle, setViewTitle] = useState<string>("Clients");
 
-	const [_viewList, setViewList] = useState<Array<Client>>([]);
+	const [_viewList, setViewList] = useState<Array<any>>([]);
 
 	const [_listLoading, setListLoading] = useState<boolean>(true);
 
@@ -104,6 +104,32 @@ export const MainDashboard: React.FC<any> = () => {
 		setListLoading(false);
 	}
 
+	async function deleteClient(clientId: string) {
+		let apiResult = await clientRepo.deleteClient({
+			clientId: clientId!,
+		});
+		if (apiResult.isSuccess) {
+			setListLoading(true);
+			getClients();
+			message.success("Delete client success");
+		} else {
+			message.success("Delete Fail");
+		}
+		setListLoading(false);
+	}
+	async function deleteRole(roleId: string) {
+		let apiResult = await roleRepo.deleteRole({
+			roleId: roleId!,
+		});
+		if (apiResult.isSuccess) {
+			setListLoading(true);
+			getRoles();
+			message.success("Delete role success");
+		} else {
+			message.success("Delete Fail");
+		}
+		setListLoading(false);
+	}
 	useEffect(() => {
 		async function initState() {
 			let userId = await LocalStorage.getUserID();
@@ -257,24 +283,20 @@ export const MainDashboard: React.FC<any> = () => {
 												title="Are you sure you want to delete?"
 												onCancel={() => {}}
 												onConfirm={async () => {
-													// let apiResult =
-													// 	await urlRepo.deleteUrl(
-													// 		{
-													// 			urlId: item.urlId!,
-													// 		}
-													// 	);
-													// if (apiResult.isSuccess) {
-													// 	setListLoading(true);
-													// 	setUrls([]);
-													// 	getUrls();
-													// 	message.success(
-													// 		"Delete success"
-													// 	);
-													// } else {
-													// 	message.success(
-													// 		"Delete Fail"
-													// 	);
-													// }
+													switch (_viewTitle) {
+														case "Clients":
+															deleteClient(
+																item.clientId
+															);
+															break;
+														case "Roles":
+															deleteRole(
+																item.roleId
+															);
+															break;
+														default:
+															break;
+													}
 												}}
 											>
 												<Button
@@ -295,7 +317,28 @@ export const MainDashboard: React.FC<any> = () => {
 											title={
 												<Link
 													onClick={() => {
-														history.push({});
+														switch (_viewTitle) {
+															case "Clients":
+																history.push({
+																	pathname:
+																		RoutePath.create_client,
+																	state: {
+																		clientId: item.clientId,
+																	},
+																});
+																break;
+															case "Roles":
+																history.push({
+																	pathname:
+																		RoutePath.create_role,
+																	state: {
+																		roleId: item.roleId,
+																	},
+																});
+																break;
+															default:
+																break;
+														}
 													}}
 												>
 													{item.name}
@@ -303,15 +346,7 @@ export const MainDashboard: React.FC<any> = () => {
 											}
 											description={`Created on ${new Date(
 												item.createdDateTime ?? ""
-											).getDate()}-${new Date(
-												item.createdDateTime ?? ""
-											).getMonth()}-${new Date(
-												item.createdDateTime ?? ""
-											).getFullYear()} ${new Date(
-												item.createdDateTime ?? ""
-											).getUTCHours()}:${new Date(
-												item.createdDateTime ?? ""
-											).getUTCMinutes()}`}
+											).toLocaleString()}`}
 										/>
 									</List.Item>
 								)}

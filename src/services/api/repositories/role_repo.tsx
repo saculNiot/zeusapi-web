@@ -41,6 +41,41 @@ export class RoleRepo {
 		}
 	}
 
+	async getRoleById(value?: { roleId: string }): Promise<Response> {
+		const path = `roleId=${value?.roleId}`;
+		let headers = {
+			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
+		};
+		let response = await this.networking.getData(
+			`get_role_by_id?${path}`,
+			headers
+		);
+		// If data is retrieved and the data is not empty, then return
+		if (
+			response.isSuccess &&
+			response.data !== null &&
+			response.data !== ""
+		) {
+			let getRoleResponse = new GetRoleResponse().fromJson(
+				response.data
+			);
+			return new Response(true, response.message, getRoleResponse);
+
+			// If data is retrieved and the data is empty, then return
+		} else if (
+			response.isSuccess &&
+			response.message === "No records found"
+		) {
+			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (!response.isSuccess) {
+			return new Response(false, response.message, "");
+		} else {
+			return new Response(false, response.message, response.data);
+		}
+	}
+
 	async saveRole(props: {
 		createdById?:string;
 		roleId?: string;

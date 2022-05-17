@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FillForm } from "../../utils/components";
 import { FormLabel, Button as ChakraButton, Text } from "@chakra-ui/react";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, message, Space } from "antd";
 import { ClientRepo } from "../../services/api/repositories/client_repo";
 import { LocalStorage } from "../../utils/localStorage";
+import { useHistory, useLocation } from "react-router-dom";
+import { Client } from "../../services/api/models/client_model";
+import { RoutePath } from "../../utils/routePath";
 
 export const CreateClient: React.FC<any> = () => {
+	let location = useLocation();
+	let history = useHistory();
+	const locationState: any = location.state;
 	const [form] = Form.useForm();
 	const clientRepo = new ClientRepo();
+	const [_clientData, setClientData] = useState<Client>();
+	const [_isFormLoading, setFormLoading] = useState<boolean>(true);
 	const children = (
 		<>
 			<FormLabel>Name</FormLabel>
@@ -86,28 +94,66 @@ export const CreateClient: React.FC<any> = () => {
 
 	const onSubmit = async (values: any) => {
 		let userId = await LocalStorage.getUserID();
-		console.log(values['attribute'])
+		console.log(values["attribute"]);
 		let apiResult = await clientRepo.saveClient({
+			clientId:
+				locationState !== undefined ? locationState.clientId : null,
 			createdById: userId ?? "",
 			name: values["name"],
 			attribute: values["attribute"],
 		});
 		if (apiResult.isSuccess) {
-			message.success("Client has created");
-			form.resetFields();
+			message.success("Client has saved");
+			locationState !== undefined
+				? history.replace(RoutePath.dashboard)
+				: form.resetFields();
 		} else {
 			message.error("Fail to save");
 		}
 	};
+
+	useEffect(() => {
+		async function initState() {
+			if (locationState !== undefined) {
+				let apiResult = await clientRepo.getClientById({
+					clientId: locationState.clientId!,
+				});
+				if (apiResult.isSuccess) {
+					setClientData(
+						new Client({
+							name: apiResult.data[0].name,
+							attribute: apiResult.data[0].attribute,
+						})
+					);
+				}
+			}
+			setFormLoading(false);
+		}
+
+		initState();
+
+		return () => {
+			setClientData(new Client({}));
+		};
+	}, []);
+
+	// Set Initial Values Using State in antd form
+	useEffect(() => {
+		form.resetFields();
+	}, [_clientData]);
 
 	return (
 		<FillForm
 			formComponents={children}
 			title={"Client's Profile"}
 			subtitle={"Please fill in the client's name and attributes"}
-			initialValue={[]}
+			initialValue={{
+				name: _clientData?.name ?? "",
+				attribute: _clientData?.attribute ?? "",
+			}}
 			form={form}
 			onSubmit={onSubmit}
+			isFormLoading={_isFormLoading}
 		>
 			{" "}
 		</FillForm>

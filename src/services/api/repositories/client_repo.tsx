@@ -41,6 +41,41 @@ export class ClientRepo {
 		}
 	}
 
+	async getClientById(value?: { clientId: string }): Promise<Response> {
+		const path = `clientId=${value?.clientId}`;
+		let headers = {
+			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
+		};
+		let response = await this.networking.getData(
+			`get_client_by_id?${path}`,
+			headers
+		);
+		// If data is retrieved and the data is not empty, then return
+		if (
+			response.isSuccess &&
+			response.data !== null &&
+			response.data !== ""
+		) {
+			let getClientResponse = new GetClientResponse().fromJson(
+				response.data
+			);
+			return new Response(true, response.message, getClientResponse);
+
+			// If data is retrieved and the data is empty, then return
+		} else if (
+			response.isSuccess &&
+			response.message === "No records found"
+		) {
+			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (!response.isSuccess) {
+			return new Response(false, response.message, "");
+		} else {
+			return new Response(false, response.message, response.data);
+		}
+	}
+
 	async saveClient(props: {
 		createdById?:string;
 		clientId?: string;

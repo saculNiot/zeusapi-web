@@ -33,6 +33,7 @@ import {
 	useColorModeValue,
 	Button as ChakraButton,
 	Text,
+	Spinner,
 } from "@chakra-ui/react";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -482,9 +483,10 @@ interface FillFormProps {
 	title: string;
 	subtitle: string;
 	formComponents: any;
-	initialValue: Array<any>;
+	initialValue: any;
 	form: FormInstance<any>;
 	onSubmit: (values: any) => Promise<void>;
+	isFormLoading: boolean;
 }
 export const FillForm: React.FC<FillFormProps> = ({
 	title,
@@ -493,13 +495,14 @@ export const FillForm: React.FC<FillFormProps> = ({
 	initialValue,
 	form,
 	onSubmit,
+	isFormLoading,
 }) => {
-	const [isLoading, setLoading] = useState<boolean>(false);
+	const [isButtonLoading, setButtonLoading] = useState<boolean>(false);
 
 	const onFinish = async (values: any) => {
-		setLoading(true);
+		setButtonLoading(true);
 		await onSubmit(values);
-		setLoading(false);
+		setButtonLoading(false);
 	};
 	return (
 		<Form
@@ -545,7 +548,11 @@ export const FillForm: React.FC<FillFormProps> = ({
 								p={{ sm: 6 }}
 								style={{ minHeight: "76vh" }}
 							>
-								{formComponents}
+								{isFormLoading ? (
+									<Spinner textAlign={"center"} />
+								) : (
+									formComponents
+								)}
 							</Stack>
 							<Row style={{ marginTop: "10px" }}>
 								<Col span={18} />
@@ -553,7 +560,7 @@ export const FillForm: React.FC<FillFormProps> = ({
 									{" "}
 									<Form.Item>
 										<FormButton
-											isLoading={isLoading}
+											isLoading={isButtonLoading}
 											title="Save"
 										/>
 									</Form.Item>
