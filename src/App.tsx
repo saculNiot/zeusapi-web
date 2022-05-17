@@ -20,6 +20,7 @@ import { ResetPassword } from "./pages/profile/ResetPassword";
 import { LocalStorage } from "./utils/localStorage";
 import { MainDashboard } from "./pages/dashboard/MainDashboard";
 import { CreateClient } from "./pages/client/CreateClient";
+import { CreateRole } from "./pages/role/CreateRole";
 
 interface AppProps {}
 
@@ -71,6 +72,11 @@ export const App: React.FC<AppProps> = () => {
 					path={RoutePath.create_client}
 					exact
 					component={CreateClient}
+				/>
+				<ProtectedRoute
+					path={RoutePath.create_role}
+					exact
+					component={CreateRole}
 				/>
 			</Switch>
 		</BrowserRouter>

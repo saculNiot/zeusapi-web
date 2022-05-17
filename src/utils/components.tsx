@@ -543,7 +543,7 @@ export const FillForm: React.FC<FillFormProps> = ({
 								bg={useColorModeValue("white", "gray.700")}
 								spacing={4}
 								p={{ sm: 6 }}
-								style={{ minHeight: "88vh" }}
+								style={{ minHeight: "76vh" }}
 							>
 								{formComponents}
 							</Stack>

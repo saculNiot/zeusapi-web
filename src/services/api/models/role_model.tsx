@@ -28,8 +28,13 @@ export class Role {
 		this.name = json.get("name");
 		this.createdById = json.get("created_by_id");
 		this.createdDateTime = json.get("created_date_time");
-        this.clients = new GetClientResponse().fromJson(
+
+		let clientMap = new Map<String, any>().set(
+			"Client",
 			json.get("relationship")
+		);
+        this.clients = new GetClientResponse().fromJson(
+			clientMap
 		);
 
 		return this;

@@ -26,16 +26,23 @@ export class Client {
 
 	// Convert the map into the User object
 	fromJson(json: Map<String, any>) {
+		console.log(json.get("attribute"));
 		this.clientId = json.get("client_id");
 		this.name = json.get("name");
 		this.createdById = json.get("created_by_id");
 		this.createdDateTime = json.get("created_date_time");
-		this.attribute = new GetClientAttributeResponse().fromJson(
+		let attributeMap = new Map<String, any>().set(
+			"attribute",
 			json.get("attribute")
 		);
-		this.roles = new GetClientAttributeResponse().fromJson(
+		this.attribute = new GetClientAttributeResponse().fromJson(
+			attributeMap
+		);
+		let relationshipMap = new Map<String, any>().set(
+			"Role",
 			json.get("relationship")
 		);
+		this.roles = new GetClientAttributeResponse().fromJson(relationshipMap);
 		return this;
 	}
 
@@ -44,7 +51,7 @@ export class Client {
 		let data = new Map<String, any>();
 		data.set("clientId", this.clientId);
 		data.set("name", this.name);
-		data.set("createdById", this.createdById)
+		data.set("createdById", this.createdById);
 		data.set("createdDateTime", this.createdDateTime);
 		data.set("attribute", this.attribute);
 

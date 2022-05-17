@@ -3,7 +3,7 @@ import { Networking } from "../../networking";
 import { Response } from "../../response";
 import { GetRoleResponse, Role } from "../models/role_model";
 
-export class ClientRepo {
+export class RoleRepo {
 	networking = new Networking();
 
 	async getAllRoles(value?: { userId: string }): Promise<Response> {

@@ -24,14 +24,9 @@ import codagenceWordLogo from "../../assets/logo/Codagence_main_logo.png";
 import { RoutePath } from "../../utils/routePath";
 import { AuthContext } from "../../utils/AuthContext";
 import { LocalStorage } from "../../utils/localStorage";
-import { FirebaseServices } from "../../utils/firebaseServices";
-import { PricingCards } from "../../utils/components";
-import { PaymentRepo } from "../../services/api/repositories/payment_repo";
 import { UserRepo } from "../../services/api/repositories/user_repo";
 import { User } from "../../services/api/models/user_model";
-import Meta from "antd/lib/card/Meta";
 import {
-	CopyOutlined,
 	CopyTwoTone,
 	DeleteOutlined,
 	EditTwoTone,
@@ -48,9 +43,16 @@ import mixpanel from "mixpanel-browser";
 import { Link, Button as ChakraButton, Stack } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import Title from "antd/lib/typography/Title";
+import { ClientRepo } from "../../services/api/repositories/client_repo";
+import { Client } from "../../services/api/models/client_model";
+import { RoleRepo } from "../../services/api/repositories/role_repo";
 
 export const MainDashboard: React.FC<any> = () => {
+	let clientRepo = new ClientRepo();
+
 	let userRepo = new UserRepo();
+
+	let roleRepo = new RoleRepo();
 
 	let history = useHistory();
 
@@ -61,26 +63,46 @@ export const MainDashboard: React.FC<any> = () => {
 
 	const [_viewTitle, setViewTitle] = useState<string>("Clients");
 
-	const [_urls, setUrls] = useState<Array<UserUrl>>([]);
+	const [_viewList, setViewList] = useState<Array<Client>>([]);
 
 	const [_listLoading, setListLoading] = useState<boolean>(true);
 
-	// async function getUrls() {
-	// 	let userId = await LocalStorage.getUserID();
-	// 	let apiResult = await urlRepo.getAllUserUrlByUserId({
-	// 		userId: userId!,
-	// 	});
+	async function getClients() {
+		setViewList([]);
 
-	// 	if (apiResult.isSuccess) {
-	// 		if (apiResult.data.length > 0)
-	// 			apiResult.data.forEach((element: UserUrl) => {
-	// 				setUrls((prevState) => {
-	// 					return [...prevState, element];
-	// 				});
-	// 			});
-	// 	}
-	// 	setListLoading(false);
-	// }
+		let userId = await LocalStorage.getUserID();
+		let apiResult = await clientRepo.getAllClients({
+			userId: userId!,
+		});
+
+		if (apiResult.isSuccess) {
+			if (apiResult.data.length > 0)
+				apiResult.data.forEach((element: Client) => {
+					setViewList((prevState) => {
+						return [...prevState, element];
+					});
+				});
+		}
+		setListLoading(false);
+	}
+
+	async function getRoles() {
+		setViewList([]);
+		let userId = await LocalStorage.getUserID();
+		let apiResult = await roleRepo.getAllRoles({
+			userId: userId!,
+		});
+
+		if (apiResult.isSuccess) {
+			if (apiResult.data.length > 0)
+				apiResult.data.forEach((element: Client) => {
+					setViewList((prevState) => {
+						return [...prevState, element];
+					});
+				});
+		}
+		setListLoading(false);
+	}
 
 	useEffect(() => {
 		async function initState() {
@@ -99,11 +121,11 @@ export const MainDashboard: React.FC<any> = () => {
 		}
 
 		initState();
-		// getUrls();
+		getClients();
 
 		return () => {
-			setViewTitle("")
-			setUrls([]);
+			setViewTitle("");
+			setViewList([]);
 			setListLoading(true);
 		};
 	}, []);
@@ -133,9 +155,7 @@ export const MainDashboard: React.FC<any> = () => {
 									colorScheme="orange"
 									variant="solid"
 									onClick={() => {
-										history.push({
-											pathname: RoutePath.fill_url,
-										});
+										history.push(RoutePath.create_role);
 									}}
 								>
 									Add Role
@@ -156,35 +176,55 @@ export const MainDashboard: React.FC<any> = () => {
 							</Stack>
 
 							<Stack direction="row" spacing={4}>
-								<Tooltip placement="topLeft" title="View clients">
+								<Tooltip
+									placement="topLeft"
+									title="View clients"
+								>
 									<Button
 										icon={
-											<UserOutlined style={{color:"#1E90FF"}}/>
+											<UserOutlined
+												style={{ color: "#1E90FF" }}
+											/>
 										}
 										shape="round"
 										size="large"
-										onClick={() => {
-											setViewTitle("Clients")
+										onClick={async () => {
+											setListLoading(true);
+											setViewTitle("Clients");
+											getClients();
 										}}
 									></Button>
 								</Tooltip>
 								<Tooltip placement="topLeft" title="View Roles">
 									<Button
-										icon={<ReconciliationOutlined style={{color:"	#FFA500"}}/>}
+										icon={
+											<ReconciliationOutlined
+												style={{ color: "	#FFA500" }}
+											/>
+										}
 										shape="round"
 										size="large"
 										onClick={() => {
-											setViewTitle("Roles")
+											setListLoading(true);
+											setViewTitle("Roles");
+											getRoles();
 										}}
 									></Button>
 								</Tooltip>
-								<Tooltip placement="topLeft" title="View Relationship">
+								<Tooltip
+									placement="topLeft"
+									title="View Relationship"
+								>
 									<Button
-										icon={<HeartOutlined style={{color:"#BA55D3"}}/>}
+										icon={
+											<HeartOutlined
+												style={{ color: "#BA55D3" }}
+											/>
+										}
 										shape="round"
 										size="large"
 										onClick={() => {
-											setViewTitle("Relationships")
+											setViewTitle("Relationships");
 										}}
 									></Button>
 								</Tooltip>
@@ -196,7 +236,7 @@ export const MainDashboard: React.FC<any> = () => {
 						<Skeleton active loading={_listLoading}>
 							<List
 								itemLayout="horizontal"
-								dataSource={_urls}
+								dataSource={_viewList}
 								renderItem={(item, index) => (
 									<List.Item
 										actions={[
@@ -215,31 +255,14 @@ export const MainDashboard: React.FC<any> = () => {
 											</Tooltip>,
 											<Popconfirm
 												title="Are you sure you want to delete?"
-												onCancel={() => {
-													mixpanel.track(
-														"Dashboard_Execute_Delete_Url_Click",
-														{
-															Confirmation:
-																"Deletion Cancel",
-														}
-													);
-												}}
+												onCancel={() => {}}
 												onConfirm={async () => {
-													mixpanel.track(
-														"Dashboard_Execute_Delete_Url_Click",
-														{
-															Confirmation:
-																"Deletion Approved",
-														}
-													);
-
 													// let apiResult =
 													// 	await urlRepo.deleteUrl(
 													// 		{
 													// 			urlId: item.urlId!,
 													// 		}
 													// 	);
-
 													// if (apiResult.isSuccess) {
 													// 	setListLoading(true);
 													// 	setUrls([]);
@@ -269,30 +292,26 @@ export const MainDashboard: React.FC<any> = () => {
 										]}
 									>
 										<List.Item.Meta
-											avatar={
-												<Avatar
-													src={`https://picsum.photos/200/300?random=${index}`}
-												/>
-											}
 											title={
 												<Link
 													onClick={() => {
-														mixpanel.track(
-															"Dashboard_View_Graph_Editor_Click"
-														);
-														history.push({
-															pathname:
-																RoutePath.graph_editor,
-															state: {
-																apiKey: item.apiKey,
-															},
-														});
+														history.push({});
 													}}
 												>
-													{item.url}
+													{item.name}
 												</Link>
 											}
-											description="Click the link to the editor"
+											description={`Created on ${new Date(
+												item.createdDateTime ?? ""
+											).getDate()}-${new Date(
+												item.createdDateTime ?? ""
+											).getMonth()}-${new Date(
+												item.createdDateTime ?? ""
+											).getFullYear()} ${new Date(
+												item.createdDateTime ?? ""
+											).getUTCHours()}:${new Date(
+												item.createdDateTime ?? ""
+											).getUTCMinutes()}`}
 										/>
 									</List.Item>
 								)}
