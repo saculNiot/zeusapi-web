@@ -19,4 +19,5 @@ export class RoutePath  {
     static graph_display: string = "/graph_display";
     static create_client: string = "/create_client";
     static create_role: string = "/create_role";
+    static create_relationship: string = "/create_relationship";
 }

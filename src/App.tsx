@@ -21,6 +21,7 @@ import { LocalStorage } from "./utils/localStorage";
 import { MainDashboard } from "./pages/dashboard/MainDashboard";
 import { CreateClient } from "./pages/client/CreateClient";
 import { CreateRole } from "./pages/role/CreateRole";
+import { CreateRelationship } from "./pages/relationship/CreateRelationship";
 
 interface AppProps {}
 
@@ -77,6 +78,11 @@ export const App: React.FC<AppProps> = () => {
 					path={RoutePath.create_role}
 					exact
 					component={CreateRole}
+				/>
+				<ProtectedRoute
+					path={RoutePath.create_relationship}
+					exact
+					component={CreateRelationship}
 				/>
 			</Switch>
 		</BrowserRouter>

@@ -193,7 +193,7 @@ export const MainDashboard: React.FC<any> = () => {
 									variant="solid"
 									onClick={() => {
 										history.push({
-											pathname: RoutePath.fill_url,
+											pathname: RoutePath.create_relationship,
 										});
 									}}
 								>
