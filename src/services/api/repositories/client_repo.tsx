@@ -56,6 +56,7 @@ export class ClientRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			
 			let getClientResponse = new GetClientResponse().fromJson(
 				response.data
 			);

@@ -1,4 +1,5 @@
-import { Role } from "./role_model";
+import { GetRelationshipResponse } from "./relationship_model";
+import { GetRoleResponse, Role } from "./role_model";
 
 export class Client {
 	clientId?: string;
@@ -26,7 +27,6 @@ export class Client {
 
 	// Convert the map into the User object
 	fromJson(json: Map<String, any>) {
-		console.log(json.get("attribute"));
 		this.clientId = json.get("client_id");
 		this.name = json.get("name");
 		this.createdById = json.get("created_by_id");
@@ -39,10 +39,12 @@ export class Client {
 			attributeMap
 		);
 		let relationshipMap = new Map<String, any>().set(
-			"Role",
+			"Relationship",
 			json.get("relationship")
 		);
-		this.roles = new GetClientAttributeResponse().fromJson(relationshipMap);
+
+		this.roles = new GetRelationshipResponse().fromJson(relationshipMap);
+		
 		return this;
 	}
 

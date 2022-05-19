@@ -46,6 +46,7 @@ import Title from "antd/lib/typography/Title";
 import { ClientRepo } from "../../services/api/repositories/client_repo";
 import { Client } from "../../services/api/models/client_model";
 import { RoleRepo } from "../../services/api/repositories/role_repo";
+import { RelationshipRepo } from "../../services/api/repositories/relationship_repo";
 
 export const MainDashboard: React.FC<any> = () => {
 	let clientRepo = new ClientRepo();
@@ -53,6 +54,8 @@ export const MainDashboard: React.FC<any> = () => {
 	let userRepo = new UserRepo();
 
 	let roleRepo = new RoleRepo();
+
+	let relationshipRepo = new RelationshipRepo();
 
 	let history = useHistory();
 
@@ -103,6 +106,23 @@ export const MainDashboard: React.FC<any> = () => {
 		}
 		setListLoading(false);
 	}
+	async function getRelationships() {
+		setViewList([]);
+		let userId = await LocalStorage.getUserID();
+		let apiResult = await relationshipRepo.getAllRelationship({
+			userId: userId!,
+		});
+
+		if (apiResult.isSuccess) {
+			if (apiResult.data.length > 0)
+				apiResult.data.forEach((element: Client) => {
+					setViewList((prevState) => {
+						return [...prevState, element];
+					});
+				});
+		}
+		setListLoading(false);
+	}
 
 	async function deleteClient(clientId: string) {
 		let apiResult = await clientRepo.deleteClient({
@@ -130,6 +150,21 @@ export const MainDashboard: React.FC<any> = () => {
 		}
 		setListLoading(false);
 	}
+
+	async function deleteRelationship(clientRoleRelId: string) {
+		let apiResult = await relationshipRepo.deleteRelationship({
+			clientRoleRelId: clientRoleRelId!,
+		});
+		if (apiResult.isSuccess) {
+			setListLoading(true);
+			getRelationships();
+			message.success("Delete relationship success");
+		} else {
+			message.success("Delete Fail");
+		}
+		setListLoading(false);
+	}
+
 	useEffect(() => {
 		async function initState() {
 			let userId = await LocalStorage.getUserID();
@@ -193,7 +228,8 @@ export const MainDashboard: React.FC<any> = () => {
 									variant="solid"
 									onClick={() => {
 										history.push({
-											pathname: RoutePath.create_relationship,
+											pathname:
+												RoutePath.create_relationship,
 										});
 									}}
 								>
@@ -251,6 +287,7 @@ export const MainDashboard: React.FC<any> = () => {
 										size="large"
 										onClick={() => {
 											setViewTitle("Relationships");
+											getRelationships();
 										}}
 									></Button>
 								</Tooltip>
@@ -268,15 +305,48 @@ export const MainDashboard: React.FC<any> = () => {
 										actions={[
 											<Tooltip
 												placement="topLeft"
-												title="Copy graph iframe"
+												title="Edit"
 											>
 												<Button
 													shape="round"
 													icon={
-														<CopyTwoTone twoToneColor="#270949" />
+														<EditTwoTone twoToneColor="#270949" />
 													}
 													size={"large"}
-													onClick={async () => {}}
+													onClick={async () => {
+														switch (_viewTitle) {
+															case "Clients":
+																history.push({
+																	pathname:
+																		RoutePath.create_client,
+																	state: {
+																		clientId:
+																			item.clientId,
+																	},
+																});
+																break;
+															case "Roles":
+																history.push({
+																	pathname:
+																		RoutePath.create_role,
+																	state: {
+																		roleId: item.roleId,
+																	},
+																});
+																break;
+															case "Relationships":
+																history.push({
+																	pathname:
+																		RoutePath.create_relationship,
+																	state: {
+																		roleId: item.clientRoleRelId,
+																	},
+																});
+																break;
+															default:
+																break;
+														}
+													}}
 												/>
 											</Tooltip>,
 											<Popconfirm
@@ -292,6 +362,11 @@ export const MainDashboard: React.FC<any> = () => {
 														case "Roles":
 															deleteRole(
 																item.roleId
+															);
+															break;
+														case "Relationships":
+															deleteRelationship(
+																item.clientRoleRelId
 															);
 															break;
 														default:
@@ -321,18 +396,30 @@ export const MainDashboard: React.FC<any> = () => {
 															case "Clients":
 																history.push({
 																	pathname:
-																		RoutePath.create_client,
+																		RoutePath.client_list,
 																	state: {
-																		clientId: item.clientId,
+																		clientId:
+																			item.clientId,
+																		name : item.name
 																	},
 																});
 																break;
 															case "Roles":
 																history.push({
 																	pathname:
-																		RoutePath.create_role,
+																		RoutePath.role_list,
 																	state: {
 																		roleId: item.roleId,
+																		name : item.name
+																	},
+																});
+																break;
+															case "Relationships":
+																history.push({
+																	pathname:
+																		RoutePath.create_relationship,
+																	state: {
+																		roleId: item.clientRoleRelId,
 																	},
 																});
 																break;
@@ -341,7 +428,10 @@ export const MainDashboard: React.FC<any> = () => {
 														}
 													}}
 												>
-													{item.name}
+													{_viewTitle ===
+													"Relationships"
+														? `${item.client[0].name} having ${item.permission} permission in ${item.role[0].name}`
+														: item.name}
 												</Link>
 											}
 											description={`Created on ${new Date(

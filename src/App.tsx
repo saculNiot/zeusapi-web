@@ -22,6 +22,8 @@ import { MainDashboard } from "./pages/dashboard/MainDashboard";
 import { CreateClient } from "./pages/client/CreateClient";
 import { CreateRole } from "./pages/role/CreateRole";
 import { CreateRelationship } from "./pages/relationship/CreateRelationship";
+import { ClientList } from "./pages/client/ClientList";
+import { RoleList } from "./pages/role/RoleList";
 
 interface AppProps {}
 
@@ -83,6 +85,16 @@ export const App: React.FC<AppProps> = () => {
 					path={RoutePath.create_relationship}
 					exact
 					component={CreateRelationship}
+				/>
+				<ProtectedRoute
+					path={RoutePath.client_list}
+					exact
+					component={ClientList}
+				/>
+				<ProtectedRoute
+					path={RoutePath.role_list}
+					exact
+					component={RoleList}
 				/>
 			</Switch>
 		</BrowserRouter>
