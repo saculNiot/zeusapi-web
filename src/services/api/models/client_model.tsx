@@ -27,6 +27,7 @@ export class Client {
 
 	// Convert the map into the User object
 	fromJson(json: Map<String, any>) {
+
 		this.clientId = json.get("client_id");
 		this.name = json.get("name");
 		this.createdById = json.get("created_by_id");

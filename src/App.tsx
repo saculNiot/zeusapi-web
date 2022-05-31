@@ -3,8 +3,6 @@ import {
 	Redirect,
 	Route,
 	Switch,
-	useHistory,
-	useLocation,
 } from "react-router-dom";
 import { Home } from "./pages/home/Home";
 import { ForgotPassword } from "./pages/login/ForgotPassword";
@@ -24,6 +22,7 @@ import { CreateRole } from "./pages/role/CreateRole";
 import { CreateRelationship } from "./pages/relationship/CreateRelationship";
 import { ClientList } from "./pages/client/ClientList";
 import { RoleList } from "./pages/role/RoleList";
+import { AccessLogList } from "./pages/accesslog/AccessLogList";
 
 interface AppProps {}
 
@@ -96,34 +95,39 @@ export const App: React.FC<AppProps> = () => {
 					exact
 					component={RoleList}
 				/>
+				<ProtectedRoute
+					path={RoutePath.access_log_list}
+					exact
+					component={AccessLogList}
+				/>
 			</Switch>
 		</BrowserRouter>
 	);
 };
 
 // Auth Protector
-// const ProtectedRoute = (props: any) => {
-// 	return LocalStorage.getAuth() ? (
-// 		LocalStorage.getEmailVerified() === "false" ? (
-// 			<Redirect exact to={RoutePath.email_verification} />
-// 		) : LocalStorage.getPackagePlan() === "free" ? (
-// 			<Redirect exact to={RoutePath.product_choices}  />
-// 		) : (
-// 			<Route {...props} />
-// 		)
-// 	) : (
-// 		<Redirect exact  to={RoutePath.default}  />
-// 	);
-// };
-
 const ProtectedRoute = (props: any) => {
 	return LocalStorage.getAuth() ? (
 		LocalStorage.getEmailVerified() === "false" ? (
 			<Redirect exact to={RoutePath.email_verification} />
+		) : LocalStorage.getPackagePlan() === "free" ? (
+			<Redirect exact to={RoutePath.product_choices}  />
 		) : (
 			<Route {...props} />
 		)
 	) : (
-		<Redirect exact to={RoutePath.default} />
+		<Redirect exact  to={RoutePath.default}  />
 	);
 };
+
+// const ProtectedRoute = (props: any) => {
+// 	return LocalStorage.getAuth() ? (
+// 		LocalStorage.getEmailVerified() === "false" ? (
+// 			<Redirect exact to={RoutePath.email_verification} />
+// 		) : (
+// 			<Route {...props} />
+// 		)
+// 	) : (
+// 		<Redirect exact to={RoutePath.default} />
+// 	);
+// };

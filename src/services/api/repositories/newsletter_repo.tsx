@@ -1,20 +1,20 @@
+import { FirebaseServices } from "../../../utils/firebaseServices";
 import { LocalStorage } from "../../../utils/localStorage";
+import { RoutePath } from "../../../utils/routePath";
 import { Networking } from "../../networking";
 import { Response } from "../../response";
 import { Newsletter } from "../models/newsletter_model";
-import { GetUserByIdResponse, User } from "../models/user_model";
 
 export class NewsletterRepo {
 	networking = new Networking();
 
 	async subscribeNewsletter(props: {
-
+		history?: any;
 		email?: string;
 	}): Promise<Response> {
 		// Initialize the save user model
 		const subscribeNewsletter = new Newsletter({
 			email: props.email,
-
 		});
 
 		// Object to Map, then to JSON
@@ -22,7 +22,7 @@ export class NewsletterRepo {
 
 		let headers = {
 			"Content-Type": "application/json",
-			"Authorization": `Bearer ${await LocalStorage.getAccessToken()}`,
+			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
 
 		let response = await this.networking.postData(
@@ -37,6 +37,7 @@ export class NewsletterRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data)
 			return new Response(true, response.message, true);
 
 			// If data is retrieved and the data is empty, then return
@@ -45,6 +46,18 @@ export class NewsletterRepo {
 			response.message === "No records found"
 		) {
 			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			props?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
 
 			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {

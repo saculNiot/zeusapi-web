@@ -11,9 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { message } from "antd";
 import { useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { NewsletterRepo } from "../../services/api/repositories/newsletter_repo";
 
 export default function CardWithIllustration() {
+	let history = useHistory();
 	let newsletterRepo = new NewsletterRepo();
 
 	const [_inputEmail, setEmail] = useState("");
@@ -22,7 +24,7 @@ export default function CardWithIllustration() {
 		if (_inputEmail.trim() === "") {
 			message.error("The email cannot be empty");
 		} else {
-			let apiResult = await newsletterRepo.subscribeNewsletter({ email: _inputEmail });
+			let apiResult = await newsletterRepo.subscribeNewsletter({ history:history,email: _inputEmail });
 			if(apiResult.isSuccess){
 			    message.success("You have successfully subscibed");
 			} else {
@@ -70,7 +72,7 @@ export default function CardWithIllustration() {
 				>
 					<Input
 						type={"text"}
-						placeholder={"abc@codagence.com"}
+						placeholder={"gohsyang@gmail.com"}
 						color={useColorModeValue("gray.800", "gray.200")}
 						bg={useColorModeValue("gray.100", "gray.600")}
 						rounded={"full"}

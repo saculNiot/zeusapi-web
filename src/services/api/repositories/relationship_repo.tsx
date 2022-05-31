@@ -1,4 +1,6 @@
+import { FirebaseServices } from "../../../utils/firebaseServices";
 import { LocalStorage } from "../../../utils/localStorage";
+import { RoutePath } from "../../../utils/routePath";
 import { Networking } from "../../networking";
 import { Response } from "../../response";
 import {
@@ -9,13 +11,12 @@ import {
 export class RelationshipRepo {
 	networking = new Networking();
 
-	async getAllRelationship(value?: { userId: string }): Promise<Response> {
-		const path = `userId=${value?.userId}`;
+	async getAllRelationship(value?: { history?: any }): Promise<Response> {
 		let headers = {
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
 		let response = await this.networking.getData(
-			`get_all_relationship_by_createdby_id?${path}`,
+			`get_all_relationship_by_createdby_id`,
 			headers
 		);
 		// If data is retrieved and the data is not empty, then return
@@ -24,6 +25,7 @@ export class RelationshipRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			let getRelationshipResponse =
 				new GetRelationshipResponse().fromJson(response.data);
 			return new Response(
@@ -38,6 +40,26 @@ export class RelationshipRepo {
 			response.message === "No records found"
 		) {
 			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			value?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			value?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
 
 			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
@@ -48,14 +70,14 @@ export class RelationshipRepo {
 	}
 
 	async getRelationshipById(value?: {
-		relationshipId: string;
+		history?: any;
+		clientRoleRelId: string;
 	}): Promise<Response> {
-		const path = `clientRoleRelId=${value?.relationshipId}`;
 		let headers = {
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
 		let response = await this.networking.getData(
-			`get_relationship_by_id?${path}`,
+			`get_relationship_by_id`,
 			headers
 		);
 		// If data is retrieved and the data is not empty, then return
@@ -64,6 +86,7 @@ export class RelationshipRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			let getRelationshipResponse =
 				new GetRelationshipResponse().fromJson(response.data);
 			return new Response(
@@ -80,6 +103,26 @@ export class RelationshipRepo {
 			return new Response(true, "No records found", "");
 
 			// If http method is timeout or being halt, then return
+		} else if (
+			response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			value?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			value?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
+
+			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
 			return new Response(false, response.message, "");
 		} else {
@@ -88,6 +131,7 @@ export class RelationshipRepo {
 	}
 
 	async saveRelationship(props: {
+		history?: any;
 		createdById?: string;
 		clientRoleRelId?: string;
 		permission?: string;
@@ -123,6 +167,7 @@ export class RelationshipRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			return new Response(true, response.message, response.data);
 
 			// If data is retrieved and the data is empty, then return
@@ -133,6 +178,28 @@ export class RelationshipRepo {
 			return new Response(true, "No records found", "");
 
 			// If http method is timeout or being halt, then return
+		} else if (
+			response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			props?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			props?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
+
+			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
 			return new Response(false, response.message, "");
 		} else {
@@ -140,7 +207,10 @@ export class RelationshipRepo {
 		}
 	}
 
-	async deleteRelationship(props: { clientRoleRelId?: string }): Promise<Response> {
+	async deleteRelationship(props: {
+		history: any;
+		clientRoleRelId?: string;
+	}): Promise<Response> {
 		// Initialize the save user model
 		const delete_relationship = new Relationship({
 			clientRoleRelId: props.clientRoleRelId,
@@ -166,6 +236,7 @@ export class RelationshipRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			return new Response(true, response.message, response.data);
 
 			// If data is retrieved and the data is empty, then return
@@ -174,6 +245,28 @@ export class RelationshipRepo {
 			response.message === "No records found"
 		) {
 			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			props?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			props?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
 
 			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {

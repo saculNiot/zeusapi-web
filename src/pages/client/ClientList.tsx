@@ -19,10 +19,6 @@ import { RoutePath } from "../../utils/routePath";
 export const ClientList: React.FC<any> = () => {
 	let clientRepo = new ClientRepo();
 
-	let userRepo = new UserRepo();
-
-	let roleRepo = new RoleRepo();
-
 	let relationshipRepo = new RelationshipRepo();
 
 	let location = useLocation();
@@ -43,8 +39,8 @@ export const ClientList: React.FC<any> = () => {
 	async function getClient() {
 		setViewList([]);
 
-		
 		let apiResult = await clientRepo.getClientById({
+			history: history,
 			clientId: locationState.clientId!,
 		});
 
@@ -75,6 +71,7 @@ export const ClientList: React.FC<any> = () => {
 
 	async function deleteClient(clientId: string) {
 		let apiResult = await clientRepo.deleteClient({
+			history: history,
 			clientId: clientId!,
 		});
 		if (apiResult.isSuccess) {
@@ -89,6 +86,7 @@ export const ClientList: React.FC<any> = () => {
 
 	async function deleteRelationship(clientRoleRelId: string) {
 		let apiResult = await relationshipRepo.deleteRelationship({
+			history: history,
 			clientRoleRelId: clientRoleRelId!,
 		});
 		if (apiResult.isSuccess) {
@@ -170,7 +168,7 @@ export const ClientList: React.FC<any> = () => {
 												<Space size="middle">
 													<Button
 														backgroundColor={
-															"red.400"
+															"orange"
 														}
 														color={"white"}
 														onClick={() => {

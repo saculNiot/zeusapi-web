@@ -1,4 +1,6 @@
+import { FirebaseServices } from "../../../utils/firebaseServices";
 import { LocalStorage } from "../../../utils/localStorage";
+import { RoutePath } from "../../../utils/routePath";
 import { Networking } from "../../networking";
 import { Response } from "../../response";
 import { Client, GetClientResponse } from "../models/client_model";
@@ -6,13 +8,12 @@ import { Client, GetClientResponse } from "../models/client_model";
 export class ClientRepo {
 	networking = new Networking();
 
-	async getAllClients(value?: { userId: string }): Promise<Response> {
-		const path = `userId=${value?.userId}`;
+	async getAllClients(value?: { history?: any }): Promise<Response> {
 		let headers = {
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
 		let response = await this.networking.getData(
-			`get_all_client_by_createdby_id?${path}`,
+			`get_all_client_by_createdby_id`,
 			headers
 		);
 		// If data is retrieved and the data is not empty, then return
@@ -21,6 +22,7 @@ export class ClientRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			let getClientResponse = new GetClientResponse().fromJson(
 				response.data
 			);
@@ -34,6 +36,27 @@ export class ClientRepo {
 			return new Response(true, "No records found", "");
 
 			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			console.log("here2");
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			value?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			value?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
+
+			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
 			return new Response(false, response.message, "");
 		} else {
@@ -41,7 +64,10 @@ export class ClientRepo {
 		}
 	}
 
-	async getClientById(value?: { clientId: string }): Promise<Response> {
+	async getClientById(value?: {
+		history?: any;
+		clientId: string;
+	}): Promise<Response> {
 		const path = `clientId=${value?.clientId}`;
 		let headers = {
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
@@ -56,7 +82,7 @@ export class ClientRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
-			
+			console.log(response.data);
 			let getClientResponse = new GetClientResponse().fromJson(
 				response.data
 			);
@@ -70,6 +96,26 @@ export class ClientRepo {
 			return new Response(true, "No records found", "");
 
 			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			value?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			value?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
+
+			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
 			return new Response(false, response.message, "");
 		} else {
@@ -78,7 +124,8 @@ export class ClientRepo {
 	}
 
 	async saveClient(props: {
-		createdById?:string;
+		history?: any;
+		createdById?: string;
 		clientId?: string;
 		name?: string;
 		attribute?: Array<any>;
@@ -111,6 +158,7 @@ export class ClientRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			return new Response(true, response.message, response.data);
 
 			// If data is retrieved and the data is empty, then return
@@ -121,6 +169,26 @@ export class ClientRepo {
 			return new Response(true, "No records found", "");
 
 			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			props?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			props?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
+
+			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {
 			return new Response(false, response.message, "");
 		} else {
@@ -128,7 +196,10 @@ export class ClientRepo {
 		}
 	}
 
-    async deleteClient(props: { clientId?: string }): Promise<Response> {
+	async deleteClient(props: {
+		history?: any;
+		clientId?: string;
+	}): Promise<Response> {
 		// Initialize the save user model
 		const delete_url = new Client({
 			clientId: props.clientId,
@@ -137,16 +208,15 @@ export class ClientRepo {
 		// Object to Map, then to JSON
 		const body = Object.fromEntries(delete_url.toJson());
 
-        let headers = {
+		let headers = {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
 
-
 		let response = await this.networking.deleteData(
 			"delete_client", // API choice is depends on the usage
 			body,
-            headers
+			headers
 		);
 
 		// If data is retrieved and the data is not empty, then return
@@ -155,6 +225,7 @@ export class ClientRepo {
 			response.data !== null &&
 			response.data !== ""
 		) {
+			console.log(response.data);
 			return new Response(true, response.message, response.data);
 
 			// If data is retrieved and the data is empty, then return
@@ -163,6 +234,26 @@ export class ClientRepo {
 			response.message === "No records found"
 		) {
 			return new Response(true, "No records found", "");
+
+			// If http method is timeout or being halt, then return
+		} else if (
+			!response.isSuccess &&
+			response.message === "Session expired"
+		) {
+			// Go back to default page if session expired
+			await FirebaseServices.signOut();
+			await LocalStorage.resetStorage();
+			alert("Session Expired.Please sign in again.");
+			props?.history.replace(RoutePath.default);
+			return new Response(false, "Session expired", "");
+		} else if (
+			!response.isSuccess &&
+			response.message === "Payment Required"
+		) {
+			// Go back to product page if payment not made
+			alert(response.data);
+			props?.history.replace(RoutePath.product_choices);
+			return new Response(false, response.message, response.data);
 
 			// If http method is timeout or being halt, then return
 		} else if (!response.isSuccess) {

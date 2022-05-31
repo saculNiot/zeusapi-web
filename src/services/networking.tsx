@@ -31,9 +31,21 @@ export class Networking {
 			} else {
 				return new Response(false, response.data, response.data);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			if (axios.isAxiosError(error)) {
-				if (error.response) {
+				if (error.response?.status === 401) {
+					return new Response(
+						false,
+						"Session expired",
+						"Session expired"
+					);
+				} else if (error.response?.status === 402) {
+					return new Response(
+						false,
+						"Payment Required",
+						"Make payment first before using the service."
+					);
+				} else if (error.response) {
 					/*
 					 * The request was made and the server responded with a
 					 * status code that falls out of the range of 2xx
@@ -94,14 +106,24 @@ export class Networking {
 				}
 			} else if (response.status === 204) {
 				return new Response(true, "No records found", response.data);
-			} else if (response.status === 401) {
-				return new Response(true, "Session expired", response.data);
 			} else {
 				return new Response(false, response.data, response.data);
 			}
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
-				if (error.response) {
+				if (error.response?.status === 401) {
+					return new Response(
+						false,
+						"Session expired",
+						"Session expired"
+					);
+				} else if (error.response?.status === 402) {
+					return new Response(
+						false,
+						"Payment Required",
+						"Make payment first before using the service."
+					);
+				} else if (error.response) {
 					/*
 					 * The request was made and the server responded with a
 					 * status code that falls out of the range of 2xx
@@ -152,15 +174,86 @@ export class Networking {
 	}
 
 	async deleteData(api: string, body: any, headers?: any): Promise<Response> {
-		if (this.url === "") {
-			this.url = Constants.urlCloud;
+		try {
+			if (this.url === "") {
+				this.url = Constants.urlCloud;
+			}
+
+			let response = await axios.delete(
+				`${this.url}/${this.apiVer}/${api}`,
+				{
+					headers,
+					data: body,
+				}
+			);
+			if (response.status === 201 || response.status === 200) {
+				var regexFormat = /[{}]/gm;
+
+				// If the data retrieved is JSON
+				if (regexFormat.test(JSON.stringify(response.data))) {
+					return new Response(
+						true,
+						"",
+						new Map(Object.entries(response.data))
+					);
+				} else {
+					return new Response(
+						true,
+						response.statusText,
+						response.data
+					);
+				}
+			} else if (response.status === 204) {
+				return new Response(true, "No records found", response.data);
+			} else if (response.status === 401) {
+				return new Response(true, "Session expired", "Session expired");
+			}
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				if (error.response?.status === 401) {
+					return new Response(
+						false,
+						"Session expired",
+						"Session expired"
+					);
+				} else if (error.response?.status === 402) {
+					return new Response(
+						false,
+						"Payment Required",
+						"Make payment first before using the service."
+					);
+				} else if (error.response) {
+					/*
+					 * The request was made and the server responded with a
+					 * status code that falls out of the range of 2xx
+					 */
+
+					return new Response(
+						false,
+						error.response.data.toString(),
+						error.response.data.toString()
+					);
+				} else if (error.request) {
+					/*
+					 * The request was made but no response was received, `error.request`
+					 * is an instance of XMLHttpRequest in the browser and an instance
+					 * of http.ClientRequest in Node.js
+					 */
+					return new Response(
+						false,
+						error.request.toString(),
+						error.request.toString()
+					);
+				} else {
+					// Something happened in setting up the request and triggered an Error
+					return new Response(
+						false,
+						error.message.toString(),
+						error.message.toString()
+					);
+				}
+			}
 		}
-
-		let response = await axios.delete(`${this.url}/${this.apiVer}/${api}`, {
-			headers,
-			data: body,
-		});
-
-		return new Response(true, response.statusText, response.data);
+		return new Response(false, "error", "Unknown Error");
 	}
 }

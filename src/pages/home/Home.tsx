@@ -67,11 +67,9 @@ export const Home: React.FC<any> = () => {
 			<div style={{ backgroundColor: "GhostWhite" }}>
 				<Hero />
 			</div>
-			{/* Features */}
-			<Features/>
 			{/* Usee case */}
 			<div id="features" className="content_3">
-				<Heading fontSize={"3xl"}>Use cases</Heading>
+				<Heading fontSize={"3xl"}>Features</Heading>
 				<Row className="use_case_row">
 					{usecaseList.map((usecaseList) => (
 						<Col xs={24} xl={6} className="use_case_col" span={6}>
@@ -109,21 +107,21 @@ const usecaseList = [
 	{
 		image: use_case1,
 		title: "Quick and Simple",
-		desc: "Hard to customise the analytic dashboard built by template or library? Let us simplify the work.",
+		desc: "Hard to add the add the access control featres into the system? Let us simplify the work.",
 	},
 	{
 		image: use_case2,
-		title: "Easy Data Summarisation",
-		desc: "Summarise your data and insert them into the chart or dashboard without a single line of code.",
+		title: "Highly customizable ",
+		desc: "The usage of Zeus API to restrict the access provides high flexibility to customize your own UI.",
 	},
 	{
 		image: use_case3,
 		title: "Fully Managed",
-		desc: "Handle your analytic dashboards all in one workplace.",
+		desc: "Handle your the user access rights all in one dashboard.",
 	},
 	{
 		image: use_case4,
-		title: "Embed Dynamically",
-		desc: "Embed the analytic dashboard in everywhere including your mobile app, website or your SaaS .",
+		title: "Various usage scenarios",
+		desc: "It can be used in the internal tools and the tiered pricing of your system.",
 	},
 ];

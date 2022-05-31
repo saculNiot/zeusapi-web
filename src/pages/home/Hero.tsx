@@ -34,16 +34,16 @@ export default function Hero() {
 						fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
 						lineHeight={"110%"}
 					>
-						Better version of PowerBI
+						Simplified Okta
 						<br />
 						<Text as={"span"} color={"pink.400"}>
-							Embedded Dashboard
+							Access Control Management Tool
 						</Text>
 					</Heading>
 					<Text color={"gray.500"}>
-						Design and embed the analytic dashboard to your site
-						with high flexibility. You can change the parameter in
-						the URL of the dashboard to show different visualisation.
+						Add access control features to your program without
+						hassle. You can restrict the user access by implenting
+						the Zeus API.
 					</Text>
 					<Stack
 						direction={"column"}
@@ -61,12 +61,10 @@ export default function Hero() {
 								bg: "#4654A3",
 							}}
 							onClick={async () => {
-
 								if (user === null) {
 									// Proceed to login page
 									history.push(RoutePath.login);
 								} else {
-									
 									history.push(RoutePath.dashboard);
 								}
 							}}

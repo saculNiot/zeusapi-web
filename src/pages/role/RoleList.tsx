@@ -30,7 +30,6 @@ export const RoleList: React.FC<any> = () => {
 
 	// Handle the state of each option in Menu bar
 
-
 	const [_viewList, setViewList] = useState<Array<Relationship>>([]);
 
 	const [_listLoading, setListLoading] = useState<boolean>(true);
@@ -38,39 +37,38 @@ export const RoleList: React.FC<any> = () => {
 	async function getRole() {
 		setViewList([]);
 
-		
 		let apiResult = await roleRepo.getRoleById({
+			history:history,
 			roleId: locationState.roleId!,
 		});
 
 		if (apiResult.isSuccess) {
-			console.log(apiResult.data[0])
+			console.log(apiResult.data[0]);
 			if (apiResult.data[0].clients !== undefined) {
-				setViewList(
-					apiResult.data[0].clients.map(
-						(item: Relationship, index: number) => {
-							console.log(index);
-
-							return {
-								index: index + 1,
-								key: item.clientRoleRelId,
-								clientRoleRelId: item.clientRoleRelId,
-								name: item.role![0].name,
-								permission: item.permission,
-								createdDateTime: new Date(
-									item.createdDateTime ?? ""
-								).toLocaleString(),
-							};
-						}
-					)
-				);
+				setViewList(await mapData(apiResult.data[0].clients));
 			}
 		}
 		setListLoading(false);
 	}
 
+	async function mapData(roleData: any) {
+		return roleData.map((item: Relationship, index: number) => {
+			return {
+				index: index + 1,
+				key: item.clientRoleRelId,
+				clientRoleRelId: item.clientRoleRelId,
+				name: item.client![0].name,
+				permission: item.permission,
+				createdDateTime: new Date(
+					item.createdDateTime ?? ""
+				).toLocaleString(),
+			};
+		});
+	}
+
 	async function deleteRole(roleId: string) {
 		let apiResult = await roleRepo.deleteRole({
+			history:history,
 			roleId: roleId!,
 		});
 		if (apiResult.isSuccess) {
@@ -85,6 +83,7 @@ export const RoleList: React.FC<any> = () => {
 
 	async function deleteRelationship(clientRoleRelId: string) {
 		let apiResult = await relationshipRepo.deleteRelationship({
+			history:history,
 			clientRoleRelId: clientRoleRelId!,
 		});
 		if (apiResult.isSuccess) {
@@ -116,7 +115,7 @@ export const RoleList: React.FC<any> = () => {
 							<Flex>
 								<Box p="4">
 									<Title level={4}>
-										{`${locationState.name}'s roles`}
+										Clients of {`${locationState.name}`}
 									</Title>
 								</Box>
 								<Spacer />
@@ -125,9 +124,7 @@ export const RoleList: React.FC<any> = () => {
 										backgroundColor={"red.400"}
 										color={"white"}
 										onClick={() => {
-											deleteRole(
-												locationState.roleId
-											);
+											deleteRole(locationState.roleId);
 										}}
 									>
 										Delete {locationState.name}
@@ -165,7 +162,7 @@ export const RoleList: React.FC<any> = () => {
 												<Space size="middle">
 													<Button
 														backgroundColor={
-															"red.400"
+															"orange"
 														}
 														color={"white"}
 														onClick={() => {

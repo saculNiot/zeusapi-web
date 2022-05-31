@@ -25,8 +25,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { RoutePath } from "../../utils/routePath";
 import { useHistory } from "react-router-dom";
-import {Suffix_Nav} from "../../utils/components"
-
+import { Suffix_Nav } from "../../utils/components";
 
 export default function Nav() {
 	const { isOpen, onToggle } = useDisclosure();
@@ -35,9 +34,11 @@ export default function Nav() {
 	let history = useHistory();
 
 	return (
-		<Box width={[
-			'100%', // 0-30em
-		  ]}>
+		<Box
+			width={[
+				"100%", // 0-30em
+			]}
+		>
 			<Flex
 				bg={useColorModeValue("white", "gray.800")}
 				color={useColorModeValue("gray.600", "white")}
@@ -74,7 +75,7 @@ export default function Nav() {
 					<img
 						style={{ width: "130px", height: "25px" }}
 						src={codagenceWordLogo}
-						alt="Codagence Logo"
+						alt="Zeusapi Logo"
 					/>
 
 					<Flex display={{ base: "none", md: "flex" }} ml={10}>
@@ -95,7 +96,6 @@ export default function Nav() {
 							fontWeight={400}
 							variant={"link"}
 							onClick={() => {
-
 								// Refresh the page if user have logged in, else proceed to login page
 								user === null
 									? history.push(RoutePath.login)
@@ -114,7 +114,6 @@ export default function Nav() {
 								bg: "#4654A3",
 							}}
 							onClick={() => {
-
 								// Refresh the page if user have logged in, else proceed to registration page
 								user === null
 									? history.push(RoutePath.register)
@@ -361,7 +360,6 @@ const Prefix_Nav: Array<NavItem> = [
 			if (user === undefined || user === null) {
 				// Proceed to login page
 				history.push(RoutePath.login);
-
 			} else {
 				history.push(RoutePath.dashboard);
 			}
@@ -377,9 +375,13 @@ const Prefix_Nav: Array<NavItem> = [
 		label: "Pricing",
 		onClick: () => {
 			window.location.href = "#pricing";
-
+		},
+	},
+	{
+		label: "Documentation",
+		onClick: () => {
+			window.location.href =
+				"https://nine-temple-484.notion.site/Zeus-API-Documentation-8d6c0c695fa445f4a237357ce9739562";
 		},
 	},
 ];
-
-

@@ -39,6 +39,7 @@ export default function Pricing() {
 				let userId = await LocalStorage.getUserID();
 				// Call api to get the payment session url
 				let apiResult = await paymentRepo.getCheckoutSessionUrl({
+					history:history,
 					userId: userId ?? "",
 					productId: productId,
 				});
@@ -113,23 +114,19 @@ export default function Pricing() {
 						<List spacing={3}>
 							<ListItem>
 								<ListIcon as={CheckIcon} color="pink.400" />
-								Free 100 MB monthly reads
+								Free 1000 requests per month
 							</ListItem>
 							<ListItem>
 								<ListIcon as={CheckIcon} color="pink.400" />
-								$0.50/GB-month total reads
+								$0.001/request
 							</ListItem>
 							<ListItem>
 								<ListIcon as={CheckIcon} color="pink.400" />
-								Unlimited dashboard created
+								Unlimited clients created
 							</ListItem>
 							<ListItem>
 								<ListIcon as={CheckIcon} color="pink.400" />
-								Unlimited charts
-							</ListItem>
-							<ListItem>
-								<ListIcon as={CheckIcon} color="pink.400" />
-								No watermark (Limited time only)
+								Unlimited roles and relationship created
 							</ListItem>
 						</List>
 
@@ -152,7 +149,7 @@ export default function Pricing() {
 							variant="outline"
 							onClick={() => {
 								setCheckoutLoading(true);
-								checkOut("prod_LWS6T2labW3J9p");
+								checkOut("prod_LirmDusfFGa8Ih");
 							}}
 						>
 							Start at Free

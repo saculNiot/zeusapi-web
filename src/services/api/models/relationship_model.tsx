@@ -36,7 +36,11 @@ export class Relationship {
 			"Client",
 			new Array<any>(json.get("client"))
 		);
+
+
 		this.client = new GetClientResponse().fromJson(clientMap);
+
+
 		let roleMap = new Map<String, any>().set(
 			"Role",
 			new Array<any>(json.get("role"))
@@ -69,7 +73,6 @@ export class GetRelationshipResponse {
 
 	// Convert JSON (containing list of data) to array
 	fromJson(json: Map<String, any>) {
-
 		if (json.get("Relationship") != null) {
 			this.relationship = [];
 			json.get("Relationship").forEach((v: Map<String, any>) => {
@@ -78,7 +81,6 @@ export class GetRelationshipResponse {
 				);
 			});
 		}
-		console.log(this.relationship);
 
 		return this.relationship;
 	}

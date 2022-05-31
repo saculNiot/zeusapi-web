@@ -294,6 +294,7 @@ export const PricingCards: React.FC<PricingProps> = ({ active }) => {
 					let email = await LocalStorage.getEmail();
 
 					apiResult = await paymentRepo.getCustomerPortalSessionUrl({
+						history:history,
 						userId: userId!,
 						email: email!,
 					});
@@ -301,6 +302,7 @@ export const PricingCards: React.FC<PricingProps> = ({ active }) => {
 				// Else go to checkout page
 				else {
 					apiResult = await paymentRepo.getCheckoutSessionUrl({
+						history:history,
 						userId: "userId",
 					});
 				}
@@ -427,7 +429,7 @@ export const Suffix_Nav: Array<NavItem> = [
 				key: 0,
 				label: "Billing",
 				subLabel: "View your bill and usage analytic",
-				onClick: async () => {
+				onClick: async (user: any, history: any) => {
 					// Call api to get the payment session url
 					let userId = await LocalStorage.getUserID();
 					let email = await LocalStorage.getEmail();
@@ -435,6 +437,7 @@ export const Suffix_Nav: Array<NavItem> = [
 					let paymentRepo = new PaymentRepo();
 					let apiResult =
 						await paymentRepo.getCustomerPortalSessionUrl({
+							history:history,
 							userId: userId!,
 							email: email!,
 						});

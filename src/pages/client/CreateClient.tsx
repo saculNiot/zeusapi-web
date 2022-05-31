@@ -96,6 +96,7 @@ export const CreateClient: React.FC<any> = () => {
 		let userId = await LocalStorage.getUserID();
 		console.log(values["attribute"]);
 		let apiResult = await clientRepo.saveClient({
+			history:history,
 			clientId:
 				locationState !== undefined ? locationState.clientId : null,
 			createdById: userId ?? "",
@@ -116,6 +117,7 @@ export const CreateClient: React.FC<any> = () => {
 		async function initState() {
 			if (locationState !== undefined) {
 				let apiResult = await clientRepo.getClientById({
+					history:history,
 					clientId: locationState.clientId!,
 				});
 				if (apiResult.isSuccess) {

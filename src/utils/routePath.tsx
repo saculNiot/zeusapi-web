@@ -22,4 +22,5 @@ export class RoutePath  {
     static create_relationship: string = "/create_relationship";
     static client_list: string = "/client_list";
     static role_list: string = "/role_list";
+    static access_log_list: string = "/access_log_list";
 }

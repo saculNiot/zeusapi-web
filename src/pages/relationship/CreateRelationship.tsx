@@ -19,6 +19,7 @@ import { UserRepo } from "../../services/api/repositories/user_repo";
 import { ClientRepo } from "../../services/api/repositories/client_repo";
 import { Client } from "../../services/api/models/client_model";
 import { RelationshipRepo } from "../../services/api/repositories/relationship_repo";
+import { Relationship } from "../../services/api/models/relationship_model";
 
 const { Option } = Select;
 
@@ -35,15 +36,17 @@ export const CreateRelationship: React.FC<any> = () => {
 
 	const [_roleList, setRoleList] = useState<Array<Role>>([]);
 	const [_clientList, setClientList] = useState<Array<Client>>([]);
+	const [_relationship, setRelationship] = useState<Relationship>(
+		new Relationship({})
+	);
 	const [_isFormLoading, setFormLoading] = useState<boolean>(true);
 	const [_isRoleListLoading, setRoleListLoading] = useState<boolean>(true);
 	const [_isClientListLoading, setClientListLoading] =
 		useState<boolean>(true);
 
 	async function getClients() {
-		let userId = await LocalStorage.getUserID();
 		let apiResult = await clientRepo.getAllClients({
-			userId: userId!,
+			history:history,
 		});
 
 		if (apiResult.isSuccess) {
@@ -60,7 +63,7 @@ export const CreateRelationship: React.FC<any> = () => {
 	async function getRoles() {
 		let userId = await LocalStorage.getUserID();
 		let apiResult = await roleRepo.getAllRoles({
-			userId: userId!,
+			history:history,
 		});
 
 		if (apiResult.isSuccess) {
@@ -98,7 +101,7 @@ export const CreateRelationship: React.FC<any> = () => {
 					<Select
 						placeholder="Select a client"
 						onChange={proceedToCreatePage}
-						style={{width:"300px"}}
+						style={{ width: "300px" }}
 						allowClear
 					>
 						<Option value={RoutePath.create_client}>
@@ -132,7 +135,7 @@ export const CreateRelationship: React.FC<any> = () => {
 					<Select
 						placeholder="Select a role"
 						onChange={proceedToCreatePage}
-						style={{width:"300px"}}
+						style={{ width: "300px" }}
 						allowClear
 					>
 						<Option value={RoutePath.create_role}>
@@ -172,8 +175,9 @@ export const CreateRelationship: React.FC<any> = () => {
 		console.log(values["client"]);
 		let userId = await LocalStorage.getUserID();
 		let apiResult = await relationshipRepo.saveRelationship({
+			history:history,
 			clientRoleRelId:
-				locationState !== undefined ? locationState.roleId : null,
+				locationState !== undefined ? locationState.clientRoleRelId : null,
 			createdById: userId ?? "",
 			client: values["client"],
 			role: values["role"],
@@ -192,23 +196,29 @@ export const CreateRelationship: React.FC<any> = () => {
 	useEffect(() => {
 		async function initState() {
 			if (locationState !== undefined) {
-				let apiResult = await roleRepo.getRoleById({
-					roleId: locationState.roleId!,
+				let apiResult = await relationshipRepo.getRelationshipById({
+					history:history,
+					clientRoleRelId: locationState.clientRoleRelId!,
 				});
 				if (apiResult.isSuccess) {
-					// setRoleData(
-					// 	new Role({
-					// 		name: apiResult.data[0].name,
-					// 	})
-					// );
+					let client: Client = apiResult.data[0].client[0];
+					let role: Role = apiResult.data[0].role[0];
+					setRelationship(
+						new Relationship({
+							client: client.clientId,
+							role: role.roleId,
+							permission: apiResult.data[0].permission,
+						})
+					);
 				}
 			}
 			setFormLoading(false);
 		}
 
-		initState();
 		getClients();
 		getRoles();
+		initState();
+
 		return () => {
 			// setRoleData(new Role({}));
 		};
@@ -217,14 +227,18 @@ export const CreateRelationship: React.FC<any> = () => {
 	// Set Initial Values Using State in antd form
 	useEffect(() => {
 		form.resetFields();
-	}, [_clientList, _roleList]);
+	}, [_clientList, _roleList, _relationship]);
 
 	return (
 		<FillForm
 			formComponents={children}
 			title={"Client role relationship details"}
 			subtitle={"Please fill in the relationship"}
-			initialValue={{}}
+			initialValue={{
+				client: _relationship.client,
+				role: _relationship.role,
+				permission: _relationship.permission,
+			}}
 			form={form}
 			onSubmit={onSubmit}
 			isFormLoading={_isFormLoading}

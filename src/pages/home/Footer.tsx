@@ -75,35 +75,28 @@ export default function Footer() {
 			>
 				<Logo />
 				<Stack direction={"row"} spacing={6}>
-					<Link
-						href={"#hero"}
-						onClick={() => {
-						}}
-					>
+					<Link href={"#hero"} onClick={() => {}}>
 						Home
 					</Link>
 					<Link
-						href={"mailto:lucasgoh@codagence.com"}
-						onClick={() => {
-						}}
+						href={"mailto:gohsyang@gmail.com"}
+						onClick={() => {}}
 					>
 						Contact
 					</Link>
 					<Link
 						href={
-							"https://codagence.notion.site/TERMS-AND-CONDITIONS-416ed24afab14050a68e2f0d80357f65"
+							"#"
 						}
-						onClick={() => {
-						}}
+						onClick={() => {}}
 					>
 						Terms
 					</Link>
 					<Link
 						href={
-							"https://codagence.notion.site/Privacy-Policy-cda6ffd6fcb446868ccf63d0be5ea5b2"
+							"#"
 						}
-						onClick={() => {
-						}}
+						onClick={() => {}}
 					>
 						Privacy
 					</Link>
@@ -124,28 +117,15 @@ export default function Footer() {
 					justify={{ base: "center", md: "space-between" }}
 					align={{ base: "center", md: "center" }}
 				>
-					<Text>© 2022 Codagence. All rights reserved</Text>
+					<Text>© 2022 Zeus API. All rights reserved</Text>
 					<Stack direction={"row"} spacing={6}>
-						<SocialButton
-							label={"Facebook"}
-							href={
-								"https://www.facebook.com/codagencewubbalubbadubbdubb"
-							}
-						>
+						<SocialButton label={"Facebook"} href={"#"}>
 							<FacebookOutlined />
 						</SocialButton>
-						<SocialButton
-							label={"Twitter"}
-							href={"https://twitter.com/codagence18"}
-						>
+						<SocialButton label={"Twitter"} href={"#"}>
 							<TwitterOutlined />
 						</SocialButton>
-						<SocialButton
-							label={"Instagram"}
-							href={
-								"https://www.instagram.com/codagence18/?hl=en"
-							}
-						>
+						<SocialButton label={"Instagram"} href={"#"}>
 							<InstagramOutlined />
 						</SocialButton>
 					</Stack>

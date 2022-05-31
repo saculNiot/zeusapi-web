@@ -4,15 +4,9 @@ import _ from "lodash";
 import {
 	Button,
 	Layout,
-	Menu,
-	Typography,
 	Row,
 	Col,
-	Space,
-	Divider,
-	Card,
 	List,
-	Avatar,
 	message,
 	Skeleton,
 	Popconfirm,
@@ -31,6 +25,7 @@ import {
 	DeleteOutlined,
 	EditTwoTone,
 	EyeInvisibleOutlined,
+	FundTwoTone,
 	HeartOutlined,
 	HomeTwoTone,
 	PlusCircleOutlined,
@@ -73,9 +68,8 @@ export const MainDashboard: React.FC<any> = () => {
 	async function getClients() {
 		setViewList([]);
 
-		let userId = await LocalStorage.getUserID();
 		let apiResult = await clientRepo.getAllClients({
-			userId: userId!,
+			history: history,
 		});
 
 		if (apiResult.isSuccess) {
@@ -93,7 +87,7 @@ export const MainDashboard: React.FC<any> = () => {
 		setViewList([]);
 		let userId = await LocalStorage.getUserID();
 		let apiResult = await roleRepo.getAllRoles({
-			userId: userId!,
+			history: history,
 		});
 
 		if (apiResult.isSuccess) {
@@ -108,9 +102,8 @@ export const MainDashboard: React.FC<any> = () => {
 	}
 	async function getRelationships() {
 		setViewList([]);
-		let userId = await LocalStorage.getUserID();
 		let apiResult = await relationshipRepo.getAllRelationship({
-			userId: userId!,
+			history: history,
 		});
 
 		if (apiResult.isSuccess) {
@@ -126,6 +119,7 @@ export const MainDashboard: React.FC<any> = () => {
 
 	async function deleteClient(clientId: string) {
 		let apiResult = await clientRepo.deleteClient({
+			history: history,
 			clientId: clientId!,
 		});
 		if (apiResult.isSuccess) {
@@ -139,6 +133,7 @@ export const MainDashboard: React.FC<any> = () => {
 	}
 	async function deleteRole(roleId: string) {
 		let apiResult = await roleRepo.deleteRole({
+			history: history,
 			roleId: roleId!,
 		});
 		if (apiResult.isSuccess) {
@@ -153,6 +148,7 @@ export const MainDashboard: React.FC<any> = () => {
 
 	async function deleteRelationship(clientRoleRelId: string) {
 		let apiResult = await relationshipRepo.deleteRelationship({
+			history: history,
 			clientRoleRelId: clientRoleRelId!,
 		});
 		if (apiResult.isSuccess) {
@@ -291,6 +287,22 @@ export const MainDashboard: React.FC<any> = () => {
 										}}
 									></Button>
 								</Tooltip>
+								<Tooltip
+									placement="topLeft"
+									title="View Access Log"
+								>
+									<Button
+										icon={
+											<FundTwoTone twoToneColor="#DB7093"/>
+
+										}
+										shape="round"
+										size="large"
+										onClick={async () => {
+											history.push(RoutePath.access_log_list)
+										}}
+									></Button>
+								</Tooltip>
 							</Stack>
 							<Title level={3}>{_viewTitle}</Title>
 						</Stack>
@@ -339,7 +351,8 @@ export const MainDashboard: React.FC<any> = () => {
 																	pathname:
 																		RoutePath.create_relationship,
 																	state: {
-																		roleId: item.clientRoleRelId,
+																		clientRoleRelId:
+																			item.clientRoleRelId,
 																	},
 																});
 																break;
@@ -400,7 +413,7 @@ export const MainDashboard: React.FC<any> = () => {
 																	state: {
 																		clientId:
 																			item.clientId,
-																		name : item.name
+																		name: item.name,
 																	},
 																});
 																break;
@@ -410,7 +423,7 @@ export const MainDashboard: React.FC<any> = () => {
 																		RoutePath.role_list,
 																	state: {
 																		roleId: item.roleId,
-																		name : item.name
+																		name: item.name,
 																	},
 																});
 																break;
@@ -419,7 +432,8 @@ export const MainDashboard: React.FC<any> = () => {
 																	pathname:
 																		RoutePath.create_relationship,
 																	state: {
-																		roleId: item.clientRoleRelId,
+																		clientRoleRelId:
+																			item.clientRoleRelId,
 																	},
 																});
 																break;

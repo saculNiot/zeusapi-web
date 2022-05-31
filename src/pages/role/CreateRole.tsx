@@ -33,16 +33,75 @@ export const CreateRole: React.FC<any> = () => {
 			>
 				<Input placeholder="Name" style={{ width: "50%" }} />
 			</Form.Item>
+			<>
+				<FormLabel>Attribute</FormLabel>
+				<Form.List name="attribute">
+					{(fields, { add, remove }) => (
+						<>
+							{fields.map(({ key, name, ...restField }) => (
+								<Space
+									key={key}
+									style={{
+										display: "flex",
+										marginBottom: 8,
+									}}
+									align="baseline"
+								>
+									<Form.Item
+										{...restField}
+										name={[name, "key"]}
+										rules={[
+											{
+												required: true,
+												message:
+													"Missing attribute key",
+											},
+										]}
+									>
+										<Input placeholder="Attribute Value" />
+									</Form.Item>
+									<Form.Item
+										{...restField}
+										name={[name, "value"]}
+										rules={[
+											{
+												required: true,
+												message:
+													"Missing attribute value",
+											},
+										]}
+									>
+										<Input placeholder="Attribute value" />
+									</Form.Item>
+									<MinusCircleOutlined
+										onClick={() => remove(name)}
+									/>
+								</Space>
+							))}
+							<Form.Item>
+								<ChakraButton
+									variant="outline"
+									onClick={() => add()}
+									leftIcon={<PlusOutlined color="blue.400" />}
+								>
+									<Text color="blue.400">Add Attribute</Text>
+								</ChakraButton>
+							</Form.Item>
+						</>
+					)}
+				</Form.List>
+			</>
 		</>
 	);
 
 	const onSubmit = async (values: any) => {
 		let userId = await LocalStorage.getUserID();
 		let apiResult = await roleRepo.saveRole({
-			roleId:
-				locationState !== undefined ? locationState.roleId : null,
+			history: history,
+			roleId: locationState !== undefined ? locationState.roleId : null,
 			createdById: userId ?? "",
 			name: values["name"],
+			attribute: values["attribute"],
 		});
 		if (apiResult.isSuccess) {
 			message.success("Role has created");
@@ -54,17 +113,18 @@ export const CreateRole: React.FC<any> = () => {
 		}
 	};
 
-
 	useEffect(() => {
 		async function initState() {
 			if (locationState !== undefined) {
 				let apiResult = await roleRepo.getRoleById({
+					history: history,
 					roleId: locationState.roleId!,
 				});
 				if (apiResult.isSuccess) {
 					setRoleData(
 						new Role({
 							name: apiResult.data[0].name,
+							attribute: apiResult.data[0].attribute,
 						})
 					);
 				}
@@ -89,7 +149,10 @@ export const CreateRole: React.FC<any> = () => {
 			formComponents={children}
 			title={"Role Details"}
 			subtitle={"Please fill in the name of the role"}
-			initialValue={{name:_roleData?.name}}
+			initialValue={{
+				name: _roleData?.name,
+				attribute: _roleData?.attribute,
+			}}
 			form={form}
 			onSubmit={onSubmit}
 			isFormLoading={_isFormLoading}
