@@ -1,5 +1,4 @@
-import { Client, GetClientResponse } from "./client_model";
-import { GetRelationshipResponse } from "./relationship_model";
+import { GetRelationshipResponse, Relationship } from "./relationship_model";
 
 export class Role {
 	roleId?: string;
@@ -7,7 +6,7 @@ export class Role {
 	createdDateTime?: string;
 	createdById?: string;
 	attribute?: Array<RoleAttribute>;
-	clients?: Array<Client>;
+	clients?: Array<Relationship>;
 
 	constructor(props: {
 		roleId?: string;
@@ -15,7 +14,7 @@ export class Role {
 		createdDateTime?: string;
 		createdById?: string;
 		attribute?: Array<RoleAttribute>;
-		clients?: Array<Client>;
+		clients?: Array<Relationship>;
 	}) {
 		this.roleId = props.roleId;
 		this.name = props.name;

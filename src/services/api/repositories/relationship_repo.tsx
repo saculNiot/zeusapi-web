@@ -76,8 +76,10 @@ export class RelationshipRepo {
 		let headers = {
 			Authorization: `Bearer ${await LocalStorage.getAccessToken()}`,
 		};
+
+		let path = `clientRoleRelId=${value?.clientRoleRelId}`;
 		let response = await this.networking.getData(
-			`get_relationship_by_id`,
+			`get_relationship_by_id?${path}`,
 			headers
 		);
 		// If data is retrieved and the data is not empty, then return

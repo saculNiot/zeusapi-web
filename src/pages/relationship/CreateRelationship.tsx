@@ -61,7 +61,6 @@ export const CreateRelationship: React.FC<any> = () => {
 	}
 
 	async function getRoles() {
-		let userId = await LocalStorage.getUserID();
 		let apiResult = await roleRepo.getAllRoles({
 			history:history,
 		});
