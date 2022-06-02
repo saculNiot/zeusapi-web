@@ -8,6 +8,8 @@ export class Relationship {
 	createdById?: string;
 	client?: any;
 	role?: any;
+	clientAttribute?: any;
+	roleAttribute?: any;
 
 	constructor(props: {
 		clientRoleRelId?: string;
@@ -16,6 +18,8 @@ export class Relationship {
 		createdById?: string;
 		client?: any;
 		role?: any;
+		clientAttribute?: any;
+		roleAttribute?: any;
 	}) {
 		this.clientRoleRelId = props.clientRoleRelId;
 		this.permission = props.permission;
@@ -23,6 +27,8 @@ export class Relationship {
 		this.createdById = props.createdById;
 		this.client = props.client;
 		this.role = props.role;
+		this.clientAttribute = props.clientAttribute;
+		this.roleAttribute = props.roleAttribute;
 	}
 
 	// Convert the map into the User object
@@ -37,9 +43,7 @@ export class Relationship {
 			new Array<any>(json.get("client"))
 		);
 
-
 		this.client = new GetClientResponse().fromJson(clientMap);
-
 
 		let roleMap = new Map<String, any>().set(
 			"Role",
@@ -59,6 +63,8 @@ export class Relationship {
 		data.set("added_date_time", this.createdDateTime);
 		data.set("role", this.role);
 		data.set("client", this.client);
+		data.set("roleAttribute", this.roleAttribute);
+		data.set("clientAttribute", this.clientAttribute);
 
 		return data;
 	}

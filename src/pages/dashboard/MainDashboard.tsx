@@ -14,21 +14,16 @@ import {
 	Tooltip,
 } from "antd";
 import "./MainDashboard.less";
-import codagenceWordLogo from "../../assets/logo/Codagence_main_logo.png";
 import { RoutePath } from "../../utils/routePath";
 import { AuthContext } from "../../utils/AuthContext";
 import { LocalStorage } from "../../utils/localStorage";
 import { UserRepo } from "../../services/api/repositories/user_repo";
 import { User } from "../../services/api/models/user_model";
 import {
-	CopyTwoTone,
 	DeleteOutlined,
 	EditTwoTone,
-	EyeInvisibleOutlined,
 	FundTwoTone,
 	HeartOutlined,
-	HomeTwoTone,
-	PlusCircleOutlined,
 	ReconciliationOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
@@ -55,7 +50,6 @@ export const MainDashboard: React.FC<any> = () => {
 	let history = useHistory();
 
 	// Get current sign in User
-	const user = useContext(AuthContext);
 
 	// Handle the state of each option in Menu bar
 
@@ -229,7 +223,20 @@ export const MainDashboard: React.FC<any> = () => {
 										});
 									}}
 								>
-									Add Relationship
+									Role-Based
+								</ChakraButton>
+								<ChakraButton
+									leftIcon={<AddIcon />}
+									colorScheme="purple"
+									variant="solid"
+									onClick={() => {
+										history.push({
+											pathname:
+												RoutePath.create_relationship_abac,
+										});
+									}}
+								>
+									Attribute-Based
 								</ChakraButton>
 							</Stack>
 

@@ -23,6 +23,7 @@ import { CreateRelationship } from "./pages/relationship/CreateRelationship";
 import { ClientList } from "./pages/client/ClientList";
 import { RoleList } from "./pages/role/RoleList";
 import { AccessLogList } from "./pages/accesslog/AccessLogList";
+import { CreateRelationshipABAC } from "./pages/relationship/CreateRelationshipABAC";
 
 interface AppProps {}
 
@@ -84,6 +85,11 @@ export const App: React.FC<AppProps> = () => {
 					path={RoutePath.create_relationship}
 					exact
 					component={CreateRelationship}
+				/>
+				<ProtectedRoute
+					path={RoutePath.create_relationship_abac}
+					exact
+					component={CreateRelationshipABAC}
 				/>
 				<ProtectedRoute
 					path={RoutePath.client_list}
